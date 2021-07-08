@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "XDAI-deploy": "truffle migrate --network xdai --reset --f 2 --to 2",
+    "XDAI-deploy-opp-trade": "truffle migrate --network xdai --reset --f 6 --to 6",
+    "FANTOM-deploy-opp-trade": "truffle migrate --network fantom --reset --f 7 --to 7"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "truffle": "^5.3.0",
+    "truffle-hdwallet-provider": "^1.0.17"
+  }
+}

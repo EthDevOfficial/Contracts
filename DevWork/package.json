@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "XDAI-deploy": "truffle migrate --network xdai --reset --f 2 --to 2"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.2.6",
+    "dotenv": "^8.2.0",
+    "truffle": "^5.3.0"
+  }
+}

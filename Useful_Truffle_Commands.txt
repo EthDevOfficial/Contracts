@@ -1,0 +1,9 @@
+truffle migrate --network ropsten --reset 
+    This runs the migrations from the beginning
+
+truffle migrate --network xdai --reset 
+
+
+truffle test ./tests/FlashLoanTest.js --network ropsten --show-events
+
+truffle migrate --network xdai --reset --f 4 --to 4
