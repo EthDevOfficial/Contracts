@@ -1,0 +1,33 @@
+.App {
+  box-sizing: border-box;
+  width: 100vw;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.Topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.Graphs {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-self: center;
+  gap: 0.5rem;
+}
+
+.GraphContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-width: 0.25rem;
+  border-color: black;
+  border-style: solid;
+  height: 80vh;
+}
