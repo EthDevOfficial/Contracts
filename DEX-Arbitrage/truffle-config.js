@@ -90,7 +90,7 @@ module.exports = {
       provider: () => new HDWalletProvider({ privateKeys: [process.env.MAINWALLET], providerOrUrl: 'ws://35.168.113.135:8546' }),
       network_id: 137,
       gas: 4000000,
-      gasPrice: 20000000000
+      gasPrice: 100000000000
     },
     fantom: {
       provider: () => new HDWalletProvider({ privateKeys: [process.env.MAINWALLET], providerOrUrl: 'ws://52.59.188.80:8546' }),

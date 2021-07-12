@@ -172,7 +172,7 @@ contract OptimizerTrade {
 	) internal{
 		SimpleCall memory params = abi.decode(call, (SimpleCall));
 		Opportunity memory opp = getSimpleOpportunity(params);
-		if(opp.outputWei > opp.inputWei){
+		if(opp.outputWei > opp.inputWei + 10000000000000000){
 			try TriArbNoRD(execContract).initiateTrade(abi.encode(opp.outerToken, opp.innerToken, opp.innerToken, opp.awayPool, opp.returnPool, opp.returnPool, opp.inputWei, opp.innerWei, opp.outputWei, 0)){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
@@ -187,7 +187,7 @@ contract OptimizerTrade {
 	) internal{
 		TriCall memory params = abi.decode(call, (TriCall));
 		TriOpportunity memory opp = getTriOpportunity(params);
-		if(opp.output3 > opp.input1){
+		if(opp.output3 > opp.input1 + 10000000000000000){
 			try TriArbNoRD(execContract).initiateTrade(abi.encode(opp.token1, opp.token2, opp.token3, opp.pool1, opp.pool2, opp.pool3, opp.input1, opp.output1, opp.output2, opp.output3)){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
