@@ -7,8 +7,9 @@ import "../External/Pancake.sol";
 import "../External/Pangolin.sol";
 import "../External/ApeSwap.sol";
 import "../External/DXSwap.sol";
+import "../External/JetSwap.sol";
 
-contract TriArbNoRD is IUniswapV2Callee, IPancakeCallee, IPangolinCallee, IApeCallee, IDXswapCallee {
+contract TriArbNoRD is IUniswapV2Callee, IPancakeCallee, IPangolinCallee, IApeCallee, IDXswapCallee, IJetswapCallee {
 
     address payable owner;
 
@@ -127,6 +128,15 @@ contract TriArbNoRD is IUniswapV2Callee, IPancakeCallee, IPangolinCallee, IApeCa
     }
 
     function DXswapCall(
+        address sender,
+        uint256 amount0,
+        uint256 amount1,
+        bytes calldata data
+    ) external override {
+        callBack(data);
+    }
+
+    function jetswapCall(
         address sender,
         uint256 amount0,
         uint256 amount1,
