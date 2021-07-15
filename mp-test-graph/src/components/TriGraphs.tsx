@@ -8,15 +8,15 @@ import Graph from './Graph'
 
 const IMBALANCE = .0092
 
-const R1a = new BigNumber('404584745298155753883610')
-const R1b = new BigNumber('212554887870712086452')
+const R1a = new BigNumber('3867048069836398061306')
+const R1b = new BigNumber('57460840958119358875174')
 
-const R2b = new BigNumber('2682842743467141')
-const R2c = new BigNumber('26991751260276137')
+const R2b = new BigNumber('43802000426928227643118')
+const R2c = new BigNumber('30213060077310057203')
 
-const R3c = new BigNumber('1306339061991646870918')
+const R3c = new BigNumber('2191250871510594310478')
 // const R3a = productOf(R1a.dividedBy(R1b), R2b.dividedBy(R2c), new BigNumber(1 + IMBALANCE), R3c)
-const R3a = new BigNumber('252225412223448634367636')
+const R3a = new BigNumber('769469043381144633661947')
 
 if (TRI_GRAPHS) console.log(`init imbalance: ${getTriImbalance(R1a, R1b, R2b, R2c, R3c, R3a).toFixed(NUM_DECIMALS)}`)
 
@@ -24,24 +24,7 @@ const inputStepDivisor = new BigNumber('100000')
 const CLOSENESS_THRESHOLD = new BigNumber('.00005')
 const RANGE_MULTIPLIER = 1
 
-// const inputFromOneStep = logTriTradeIterator(
-//   R1a, R1b, R2b, R2c, R3c, R3a,
-//   inputStepDivisor,
-//   1,
-//   CLOSENESS_THRESHOLD,
-//   new BigNumber('.000054')
-// )
-// const data1 = getTriTradeLineFromInputRange(
-//   [
-//     inputFromOneStep.minus(inputFromOneStep.multipliedBy(RANGE_MULTIPLIER)), 
-//     inputFromOneStep.plus(inputFromOneStep.multipliedBy(RANGE_MULTIPLIER))
-//   ], // range
-//   100,  // number of values (resolution)
-//   100000, // divisor to convert BN to normal numbers
-//   R1a, R1b, R2b, R2c, R3c, R3a
-// )
-
-const MAX_ITERATIONS = 3
+const MAX_ITERATIONS = 7
 const inputFromIterator = logTriTradeIterator(
   R1a, R1b, R2b, R2c, R3c, R3a,
   inputStepDivisor, 

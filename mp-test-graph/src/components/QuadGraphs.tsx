@@ -5,7 +5,7 @@ import { productOf } from "../helpers/helpers"
 import { getQuadImbalance, getQuadTradeLineFromInputRange, logQuadTradeIterator } from "../helpers/quadHelpers"
 import Graph from './Graph'
 
-const IMBALANCE = .0092
+const IMBALANCE = .033
 
 const R1a = new BigNumber('404584745298155753883610')
 const R1b = new BigNumber('212554887870712086452')
@@ -16,7 +16,7 @@ const R2c = new BigNumber('26991751260276137')
 const R3c = new BigNumber('1306339061991646870918')
 const R3d = new BigNumber('252225412223448634367636')
 
-const R4d = new BigNumber('252225412223448634367636')
+const R4d = new BigNumber('252225412223448634367')
 // const R4a = new BigNumber('252225412223448634367636')
 const R4a = productOf(R1a.dividedBy(R1b), R2b.dividedBy(R2c), R3c.dividedBy(R3d), new BigNumber(1 + IMBALANCE), R4d)
 

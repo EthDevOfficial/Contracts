@@ -13,4 +13,4 @@ export const SWAP_FEE_QUAD_SUM = sumOf(ONE.minus(SWAP_FEE_ACTUAL1), ONE.minus(SW
 export const NUM_DECIMALS = 6
 
 export const TRI_GRAPHS = false
-export const QUAD_GRAPHS = false
+export const QUAD_GRAPHS = true

@@ -8,7 +8,7 @@ import { QUAD_GRAPHS, TRI_GRAPHS } from './helpers/constants';
 function App() {
   return (
     <div className="App">
-      <div className="Topbar"> {TRI_GRAPHS ? 'Tri MP Test' : 'Simple MP Test'} </div>
+      <div className="Topbar"> {TRI_GRAPHS ? 'Tri Arb Test' : QUAD_GRAPHS ? 'Quad Arb Test' : 'Simple Arb Test'} </div>
       <div className="Graphs">
         <IfElse 
           showIf={TRI_GRAPHS}
