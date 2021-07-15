@@ -89,13 +89,13 @@ module.exports = {
     matic: {
       provider: () => new HDWalletProvider({ privateKeys: [process.env.MAINWALLET], providerOrUrl: 'ws://35.168.113.135:8546' }),
       network_id: 137,
-      gas: 4000000,
-      gasPrice: 100000000000
+      gas: 5000000,
+      gasPrice: 150000000000
     },
     fantom: {
-      provider: () => new HDWalletProvider({ privateKeys: [process.env.MAINWALLET], providerOrUrl: 'ws://52.59.188.80:8546' }),
+      provider: () => new HDWalletProvider({ privateKeys: [process.env.MAINWALLET], providerOrUrl: 'ws://52.57.51.208:8546' }),
       network_id: 250,
-      gas: 8000000,
+      gas: 5000000,
       gasPrice: 90000000000
     },
     avalanche: {
