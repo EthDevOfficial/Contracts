@@ -7,13 +7,13 @@ import Graph from './Graph'
 
 const IMBALANCE = .0062
 
-const R1in = new BigNumber('833278512869163330674731')
-const R1out = new BigNumber('2038188010304541813540')
+const R1in = new BigNumber('689036832415586894698')
+const R1out = new BigNumber('97044563331778055356')
 
-// const R2in = new BigNumber('21880839199025783')
-const R2out = new BigNumber('9016371641490658451') 
+const R2in = new BigNumber('31205545200367903849354')
+const R2out = new BigNumber('228335034293238842646782') 
 
-const R2in = R2out.multipliedBy(R1out.dividedBy(R1in.plus(R1in.multipliedBy(IMBALANCE))))
+// const R2in = R2out.multipliedBy(R1out.dividedBy(R1in.plus(R1in.multipliedBy(IMBALANCE))))
 
 if (!TRI_GRAPHS) console.log(`init imbalance: ${getSimpleImbalance(R1in, R1out, R2out, R2in)}`)
 

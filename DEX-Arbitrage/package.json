@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "POLYGON-deploy-opp-trade": "truffle migrate --network matic --reset --f 5 --to 5",
     "XDAI-deploy": "truffle migrate --network xdai --reset --f 2 --to 2",
     "XDAI-deploy-opp-trade": "truffle migrate --network xdai --reset --f 6 --to 6",
     "FANTOM-deploy-opp-trade": "truffle migrate --network fantom --reset --f 7 --to 7"
