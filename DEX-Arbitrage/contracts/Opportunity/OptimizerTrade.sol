@@ -86,6 +86,22 @@ contract OptimizerTrade {
 		uint256 output4;
 	}
 
+	struct TradeObject {
+        address token1;
+        address token2;
+        address token3;
+        address token4;
+        address pool1;
+        address pool2;
+        address pool3;
+        address pool4;
+        uint256 input;
+        uint256 output1;
+        uint256 output2;
+        uint256 output3;
+        uint256 output4;
+    }
+
 	struct Iter {
 		uint iterator;
 		bytes16 targetImbalance;
@@ -230,7 +246,7 @@ contract OptimizerTrade {
 		SimpleCall memory params = abi.decode(call, (SimpleCall));
 		Opportunity memory opp = getSimpleOpportunity(params);
 		if(opp.outputWei > opp.inputWei + 10000000000000000){
-			try TriArbNoRD(execContract).initiateTrade(abi.encode(opp.outerToken, opp.innerToken, opp.innerToken, opp.awayPool, opp.returnPool, opp.returnPool, opp.inputWei, opp.innerWei, opp.outputWei, 0)){}
+			try TriArbNoRD(execContract).initiateTrade(abi.encode(TradeObject(opp.outerToken, opp.innerToken, opp.innerToken, opp.innerToken, opp.awayPool, opp.returnPool, opp.returnPool, opp.returnPool, opp.inputWei, opp.innerWei, opp.outputWei, 0, 0) )){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
 			}catch{
@@ -245,7 +261,7 @@ contract OptimizerTrade {
 		TriCall memory params = abi.decode(call, (TriCall));
 		TriOpportunity memory opp = getTriOpportunity(params);
 		if(opp.output3 > opp.input1 + 10000000000000000){
-			try TriArbNoRD(execContract).initiateTrade(abi.encode(opp.token1, opp.token2, opp.token3, opp.pool1, opp.pool2, opp.pool3, opp.input1, opp.output1, opp.output2, opp.output3)){}
+			try TriArbNoRD(execContract).initiateTrade(abi.encode(TradeObject(opp.token1, opp.token2, opp.token3, opp.token3, opp.pool1, opp.pool2, opp.pool3, opp.pool3, opp.input1, opp.output1, opp.output2, opp.output3, 0))){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
 			}catch{
@@ -260,11 +276,11 @@ contract OptimizerTrade {
 		QuadCall memory params = abi.decode(call, (QuadCall));
 		QuadOpportunity memory opp = getQuadOpportunity(params);
 		if(opp.output4 > opp.input1 + 10000000000000000){
-			try TriArbNoRD(execContract).initiateTrade(abi.encode(
+			try TriArbNoRD(execContract).initiateTrade(abi.encode(TradeObject(
 				opp.token1, opp.token2, opp.token3, opp.token4, 
 				opp.pool1, opp.pool2, opp.pool3, opp.pool4,
 				opp.input1, opp.output1, opp.output2, opp.output3, opp.output4
-			)){}
+			))){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
 			}catch{
