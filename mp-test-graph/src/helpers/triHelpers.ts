@@ -27,7 +27,6 @@ export function logTriTrade(
     log(`imbalance: ${getTriImbalance(R1aPost, R1bPost, R2bPost, R2cPost, R3cPost, R3aPost).toFixed(NUM_DECIMALS)}`)
     log()
   }
-  
 }
 
 export function logTriTradeFrom1(

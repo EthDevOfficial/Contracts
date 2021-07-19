@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { ONE, SWAP_FEE_ACTUAL1, SWAP_FEE_ACTUAL2, SWAP_FEE_SIMPLE_SUM, TRI_GRAPHS } from "./constants";
+import { ONE, QUAD_GRAPHS, SWAP_FEE_ACTUAL1, SWAP_FEE_ACTUAL2, SWAP_FEE_SIMPLE_SUM, TRI_GRAPHS } from "./constants";
 import { outFromIn } from "./helpers";
 import { getSimpleImbalance, logSimpleTradeFromIn } from "./simpleHelpers";
 
@@ -55,11 +55,11 @@ export function logSimpleTradeIterator(
     )
     if (postStepImbalance.minus(SWAP_FEE_SIMPLE_SUM).absoluteValue().isLessThan(threshold)) {
       logSimpleTradeFromIn('iterative formula simple trade', inputStep, R1a, R1b, R2a, R2b)
-      if (!TRI_GRAPHS) console.log(`number of iterations: ${i + 1}`)
+      if (!TRI_GRAPHS && !QUAD_GRAPHS) console.log(`number of iterations: ${i + 1}`)
       return inputStep
     }
   }
   logSimpleTradeFromIn('iterative formula simple trade', inputStep, R1a, R1b, R2a, R2b)
-  if (!TRI_GRAPHS) console.log(`number of iterations (max): ${maxIterations}`)
+  if (!TRI_GRAPHS && !QUAD_GRAPHS) console.log(`number of iterations (max): ${maxIterations}`)
   return inputStep
 }

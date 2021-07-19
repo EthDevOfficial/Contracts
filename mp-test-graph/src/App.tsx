@@ -2,17 +2,24 @@ import './App.css'
 import IfElse from './components/IfElse';
 import SimpleGraphs from './components/SimpleGraphs'
 import TriGraphs from './components/TriGraphs'
-import { TRI_GRAPHS } from './helpers/constants';
+import QuadGraphs from './components/QuadGraphs'
+import { QUAD_GRAPHS, TRI_GRAPHS } from './helpers/constants';
 
 function App() {
   return (
     <div className="App">
-      <div className="Topbar"> {TRI_GRAPHS ? 'Tri MP Test' : 'Simple MP Test'} </div>
+      <div className="Topbar"> {TRI_GRAPHS ? 'Tri Arb Test' : QUAD_GRAPHS ? 'Quad Arb Test' : 'Simple Arb Test'} </div>
       <div className="Graphs">
         <IfElse 
           showIf={TRI_GRAPHS}
           show={<TriGraphs />}
-          showElse={<SimpleGraphs/>}
+          showElse={
+            <IfElse
+              showIf={QUAD_GRAPHS}
+              show={<QuadGraphs />}
+              showElse={<SimpleGraphs />}
+            />
+          }
         />
       </div>
     </div>

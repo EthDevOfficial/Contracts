@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js"
-import { NUM_DECIMALS, ONE, SWAP_FEE_ACTUAL1, SWAP_FEE_ACTUAL2, TRI_GRAPHS } from "./constants"
+import { NUM_DECIMALS, ONE, QUAD_GRAPHS, SWAP_FEE_ACTUAL1, SWAP_FEE_ACTUAL2, TRI_GRAPHS } from "./constants"
 import { getPostRatioDecrease, getPostRatioIncrease, inFromOut, inverse, linspace, outFromIn } from "./helpers"
 import { outputForTargetMP } from "./moveToTarget"
 
@@ -14,7 +14,7 @@ export function logSimpleTrade(
   postRatio1: BigNumber,
   postRatio2: BigNumber
 ) {
-  if (!TRI_GRAPHS) {
+  if (!TRI_GRAPHS && !QUAD_GRAPHS) {
     log(title)
     log(`diff: ${out2.minus(in1).toFixed(NUM_DECIMALS)}`)
     log(`input: ${in1.toFixed(NUM_DECIMALS)}`)
@@ -37,7 +37,7 @@ export function logSimpleTradeNoTarget(
   R2a: BigNumber,
   R2b: BigNumber
 ) {
-  if (!TRI_GRAPHS) {
+  if (!TRI_GRAPHS && !QUAD_GRAPHS) {
     log(title)
     log(`diff: ${out2.minus(in1).toFixed(NUM_DECIMALS)}`)
     log(`input: ${in1.toFixed(NUM_DECIMALS)}`)

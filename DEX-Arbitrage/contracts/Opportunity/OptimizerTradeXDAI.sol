@@ -38,6 +38,18 @@ contract OptimizerTradeXDAI {
 		uint256 swapFeeSum;
 	}
 
+	struct QuadCall {
+		address token1;
+		address token2;
+		address token3;
+		address token4;
+		address exchange1;
+		address exchange2;
+		address exchange3;
+		address exchange4;
+		uint256 swapFeeSum;
+	}
+
 	struct Opportunity {
 		address outerToken;
 		address innerToken;
@@ -61,6 +73,22 @@ contract OptimizerTradeXDAI {
 		uint256 output3;
 	}
 
+	struct QuadOpportunity {
+		address token1;
+		address token2;
+		address token3;
+		address token4;
+		address pool1;
+		address pool2;
+		address pool3;
+		address pool4;
+		uint256 input1;
+		uint256 output1; // == input 2
+		uint256 output2; // == input 3
+		uint256 output3; // == input 4
+		uint256 output4;
+	}
+
 	struct Iter {
 		uint iterator;
 		bytes16 targetImbalance;
@@ -73,6 +101,23 @@ contract OptimizerTradeXDAI {
 		OptimalInfo info1;
 		OptimalInfo info2;
 		OptimalInfo info3;
+	}
+
+	struct QuadIteratorInputs {
+		QuadCall params;
+		bytes16 initImbalance;
+		OptimalInfo info1;
+		OptimalInfo info2;
+		OptimalInfo info3;
+		OptimalInfo info4;
+	}
+
+	struct QuadIteratorReturns {
+		uint256 input;
+		uint256 out1in2;
+		uint256 out2in3;
+		uint256 out3in4;
+		uint256 output;
 	}
 
 	struct OptimalInfo {
@@ -164,13 +209,19 @@ contract OptimizerTradeXDAI {
 		for (uint i = 0; i < calls.length; i++) {
 			getOpportunityFromCall(calls[i]);
 		}
-  	}
+  }
 
 	function triMulticall(bytes[] calldata calls) external{
 		for (uint i = 0; i < calls.length; i++) {
 			getTriOpportunityFromCall(calls[i]);
 		}
-  	}
+  }
+
+	function quadMulticall(bytes[] calldata calls) external{
+		for (uint i = 0; i < calls.length; i++) {
+			getQuadOpportunityFromCall(calls[i]);
+		}
+  }
 
 	function getOpportunityFromCall(
 		bytes memory call
@@ -194,6 +245,25 @@ contract OptimizerTradeXDAI {
 		TriOpportunity memory opp = getTriOpportunity(params);
 		if(opp.output3 > opp.input1){
 			try TriArbNoRD(execContract).initiateTrade(abi.encode(opp.token1, opp.token2, opp.token3, opp.pool1, opp.pool2, opp.pool3, opp.input1, opp.output1, opp.output2, opp.output3)){}
+			catch Error(string memory reason){
+				emit ErrorHandled(reason);
+			}catch{
+				emit ErrorHandled('Caught with no error');
+			}
+		}
+	}
+
+	function getQuadOpportunityFromCall(
+		bytes memory call
+	) internal{
+		QuadCall memory params = abi.decode(call, (QuadCall));
+		QuadOpportunity memory opp = getQuadOpportunity(params);
+		if(opp.output4 > opp.input1 + 10000000000000000){
+			try TriArbNoRD(execContract).initiateTrade(abi.encode(
+				opp.token1, opp.token2, opp.token3, opp.token4, 
+				opp.pool1, opp.pool2, opp.pool3, opp.pool4,
+				opp.input1, opp.output1, opp.output2, opp.output3, opp.output4
+			)){}
 			catch Error(string memory reason){
 				emit ErrorHandled(reason);
 			}catch{
@@ -544,6 +614,223 @@ contract OptimizerTradeXDAI {
 			info1.tokenIn, info1.tokenOut, info2.tokenOut,
 			info1.poolAddress, info2.poolAddress, info3.poolAddress, 
 			info1.input, info1.output, info2.output, info3.output
+		);
+	}
+
+	function getQuadImbalance(
+		uint256 reserve1A, 
+		uint256 reserve1B,
+		uint256 reserve2B,
+		uint256 reserve2C,
+		uint256 reserve3C,
+		uint256 reserve3D,
+		uint256 reserve4D,
+		uint256 reserve4A
+	) internal pure returns (bytes16) {
+		bytes16 mpBA = ABDKFloat.div(ABDKFloat.fromUInt(reserve1B), ABDKFloat.fromUInt(reserve1A));
+		bytes16 mpCB = ABDKFloat.div(ABDKFloat.fromUInt(reserve2C), ABDKFloat.fromUInt(reserve2B));
+		bytes16 mpDC = ABDKFloat.div(ABDKFloat.fromUInt(reserve3D), ABDKFloat.fromUInt(reserve3C));
+		bytes16 mpAD = ABDKFloat.div(ABDKFloat.fromUInt(reserve4A), ABDKFloat.fromUInt(reserve4D));
+		return ABDKFloat.sub(ABDKFloat.mul(ABDKFloat.mul(mpBA, mpCB), ABDKFloat.mul(mpDC, mpAD)), ABDKFloat.fromUInt(1));
+	}
+
+	function getQuadTradeIterator(
+		QuadIteratorInputs memory inputs
+	) internal view returns (QuadIteratorReturns memory) {
+		QuadIteratorReturns memory quadReturns = QuadIteratorReturns(0, 0, 0, 0, 0);
+		quadReturns.input = inputs.info1.reserveIn > INPUT_STEP_DIVISOR ? inputs.info1.reserveIn / INPUT_STEP_DIVISOR : 1000;
+		quadReturns.out1in2 = IUniswapV2Router02(inputs.params.exchange1).getAmountOut(quadReturns.input, inputs.info1.reserveIn, inputs.info1.reserveOut);
+		quadReturns.out2in3 = quadReturns.out1in2 > 0 ? IUniswapV2Router02(inputs.params.exchange2).getAmountOut(quadReturns.out1in2, inputs.info2.reserveIn, inputs.info2.reserveOut) : 0;
+		quadReturns.out3in4 = quadReturns.out2in3 > 0 ? IUniswapV2Router02(inputs.params.exchange3).getAmountOut(quadReturns.out2in3, inputs.info3.reserveIn, inputs.info3.reserveOut) : 0;
+		quadReturns.output = quadReturns.out3in4 > 0 ? IUniswapV2Router02(inputs.params.exchange4).getAmountOut(quadReturns.out3in4, inputs.info4.reserveIn, inputs.info4.reserveOut) : 0;
+		if (quadReturns.output == 0) {
+			return quadReturns;
+		}
+		Iter memory iter = Iter(
+			0, // iterator
+			ABDKFloat.div(ABDKFloat.fromUInt(inputs.params.swapFeeSum), ABDKFloat.fromUInt(10000)), // target imbalance
+			getQuadImbalance(
+				inputs.info1.reserveIn + quadReturns.input,
+				inputs.info1.reserveOut - quadReturns.out1in2,
+				inputs.info2.reserveIn + quadReturns.out1in2,
+				inputs.info2.reserveOut - quadReturns.out2in3,
+				inputs.info3.reserveIn + quadReturns.out2in3,
+				inputs.info3.reserveOut - quadReturns.out3in4,
+				inputs.info4.reserveIn + quadReturns.out3in4,
+				inputs.info4.reserveOut - quadReturns.output
+			) // post step imbalance
+		);
+		for (iter.iterator = 0; iter.iterator < MAX_ITERATIONS; iter.iterator++) {
+			quadReturns.input = ABDKFloat.toUInt(
+				ABDKFloat.mul(
+					ABDKFloat.sub(inputs.initImbalance, iter.targetImbalance),
+					ABDKFloat.div(ABDKFloat.fromUInt(quadReturns.input), ABDKFloat.sub(inputs.initImbalance, iter.postStepImbalance))
+				)
+			);
+			quadReturns.out1in2 = quadReturns.input > 0 ? IUniswapV2Router02(inputs.params.exchange1).getAmountOut(quadReturns.input, inputs.info1.reserveIn, inputs.info1.reserveOut) : 0;
+			quadReturns.out2in3 = quadReturns.out1in2 > 0 ? IUniswapV2Router02(inputs.params.exchange2).getAmountOut(quadReturns.out1in2, inputs.info2.reserveIn, inputs.info2.reserveOut) : 0;
+			quadReturns.out3in4 = quadReturns.out2in3 > 0 ? IUniswapV2Router02(inputs.params.exchange3).getAmountOut(quadReturns.out2in3, inputs.info3.reserveIn, inputs.info3.reserveOut) : 0;
+			quadReturns.output = quadReturns.out3in4 > 0 ? IUniswapV2Router02(inputs.params.exchange4).getAmountOut(quadReturns.out3in4, inputs.info4.reserveIn, inputs.info4.reserveOut) : 0;
+			if (quadReturns.output == 0) {
+				return quadReturns;
+			}
+			iter.postStepImbalance = getQuadImbalance(
+				inputs.info1.reserveIn + quadReturns.input,
+				inputs.info1.reserveOut - quadReturns.out1in2,
+				inputs.info2.reserveIn + quadReturns.out1in2,
+				inputs.info2.reserveOut - quadReturns.out2in3,
+				inputs.info3.reserveIn + quadReturns.out2in3,
+				inputs.info3.reserveOut - quadReturns.out3in4,
+				inputs.info4.reserveIn + quadReturns.out3in4,
+				inputs.info4.reserveOut - quadReturns.output
+			);
+			if (ABDKFloat.cmp(ITERATOR_THRESHOLD, ABDKFloat.abs(ABDKFloat.sub(iter.postStepImbalance, iter.targetImbalance))) == 1) {
+				return quadReturns;
+			}
+		}
+		return quadReturns;
+	}
+
+	function getQuadOpportunity (
+		QuadCall memory params
+	) internal view returns (QuadOpportunity memory) {
+		OptimalInfo memory info1 = OptimalInfo(
+			params.token1, // tokenIn
+			params.token2, // tokenOut
+			0, // optimalInput
+			0, // optimalOutput
+			0, // reserveIn 
+			0, // reserveOut
+			address(0), // poolAddress
+			IUniswapV2Router02(params.exchange1).factory()
+		);
+		
+		info1 = getOptimalInfo(info1);
+
+		if(info1.reserveIn <= MIN_RESERVE || info1.reserveOut <= MIN_RESERVE){
+			return QuadOpportunity(
+				address(0), 
+				address(0),
+				address(0),
+				address(0), 
+				address(0), 
+				address(0),
+				address(0),
+				address(0),
+				0, 0, 0, 0, 0
+			);
+		}
+
+		OptimalInfo memory info2 = OptimalInfo(
+			params.token2, // tokenIn
+			params.token3, // tokenOut
+			0, // input
+			0, // output
+			0, // reserveIn 
+			0, // reserveOut
+			address(0), // poolAddress
+			IUniswapV2Router02(params.exchange2).factory()
+		);
+
+		info2 = getOptimalInfo(info2);
+
+		if(info2.reserveIn <= MIN_RESERVE || info2.reserveOut <= MIN_RESERVE){
+			return QuadOpportunity(
+				address(0), 
+				address(0),
+				address(0),
+				address(0), 
+				address(0), 
+				address(0),
+				address(0),
+				address(0),
+				0, 0, 0, 0, 0
+			);
+		}
+		
+		OptimalInfo memory info3 = OptimalInfo(
+			params.token3, // tokenIn
+			params.token4, // tokenOut
+			0, // optimalInput
+			0, // optimalOutput
+			0, // reserveIn 
+			0, // reserveOut
+			address(0), // poolAddress
+			IUniswapV2Router02(params.exchange3).factory()
+		);
+
+
+
+		info3 = getOptimalInfo(info3);
+
+		if(info3.reserveIn <= MIN_RESERVE || info3.reserveOut <= MIN_RESERVE){
+			return QuadOpportunity(
+				address(0), 
+				address(0),
+				address(0),
+				address(0), 
+				address(0), 
+				address(0),
+				address(0),
+				address(0),
+				0, 0, 0, 0, 0
+			);
+		}
+
+		OptimalInfo memory info4 = OptimalInfo(
+			params.token4, // tokenIn
+			params.token1, // tokenOut
+			0, // optimalInput
+			0, // optimalOutput
+			0, // reserveIn 
+			0, // reserveOut
+			address(0), // poolAddress
+			IUniswapV2Router02(params.exchange4).factory()
+		);
+
+		info4 = getOptimalInfo(info4);
+
+		if(info4.reserveIn <= MIN_RESERVE || info4.reserveOut <= MIN_RESERVE){
+			return QuadOpportunity(
+				address(0), 
+				address(0),
+				address(0),
+				address(0), 
+				address(0), 
+				address(0),
+				address(0),
+				address(0),
+				0, 0, 0, 0, 0
+			);
+		}
+
+		bytes16 imbalance = getQuadImbalance(
+			info1.reserveIn, info1.reserveOut,
+			info2.reserveIn, info2.reserveOut,
+			info3.reserveIn, info3.reserveOut,
+			info4.reserveIn, info4.reserveOut
+		);
+
+		if (ABDKFloat.cmp(imbalance, ABDKFloat.div(ABDKFloat.fromUInt(params.swapFeeSum), ABDKFloat.fromUInt(10000))) != 1) {
+			return QuadOpportunity(
+				address(0), 
+				address(0),
+				address(0),
+				address(0), 
+				address(0), 
+				address(0),
+				address(0),
+				address(0),
+				0, 0, 0, 0, 0
+			);
+		}
+
+		QuadIteratorReturns memory quadReturns = getQuadTradeIterator(QuadIteratorInputs(params, imbalance, info1, info2, info3, info4));
+		
+		return QuadOpportunity(
+			info1.tokenIn, info1.tokenOut, info2.tokenOut, info3.tokenOut,
+			info1.poolAddress, info2.poolAddress, info3.poolAddress, info4.poolAddress,
+			quadReturns.input, quadReturns.out1in2, quadReturns.out2in3, quadReturns.out3in4, quadReturns.output
 		);
 	}
 
